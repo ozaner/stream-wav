@@ -9,9 +9,11 @@ use stream_download::{
 };
 use thiserror::Error;
 
-pub async fn new_http_wav<S: WavSample>(
-    url: Url,
-) -> Result<StreamingWav<S, StreamDownload<MemoryStorageProvider>>, NewHttpWavError> {
+/// A nameable alias for the [`StreamingWav`] type outputted by [`new_http_wav`].
+#[allow(type_alias_bounds)]
+pub type HttpStreamingWav<S: WavSample> = StreamingWav<S, StreamDownload<MemoryStorageProvider>>;
+
+pub async fn new_http_wav<S: WavSample>(url: Url) -> Result<HttpStreamingWav<S>, NewHttpWavError> {
     let reader = StreamDownload::new_http(
         url,
         MemoryStorageProvider,
