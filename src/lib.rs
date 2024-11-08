@@ -1,9 +1,12 @@
 mod streaming_wav;
 
-pub use reqwest::Client; //Need to re-export since it's used in [`new_http_wav`]'s api.
+//Need to re-export since it's used in [`new_http_wav`]'s api.
+pub mod reqwest {
+    pub use ::reqwest::Client;
+}
 pub use streaming_wav::*;
 
-use reqwest::Url;
+use ::reqwest::Url;
 use stream_download::{
     http::{HttpStream, HttpStreamError},
     storage::memory::MemoryStorageProvider,
@@ -16,7 +19,7 @@ use thiserror::Error;
 pub type HttpStreamingWav<S: WavSample> = StreamingWav<S, StreamDownload<MemoryStorageProvider>>;
 
 pub async fn get_wav_stream<S: WavSample>(
-    client: Client,
+    client: reqwest::Client,
     url: Url,
 ) -> Result<HttpStreamingWav<S>, NewHttpWavError> {
     let reader = StreamDownload::from_stream(
@@ -35,8 +38,8 @@ pub enum NewHttpWavError {
     WavDecodingError(#[from] StreamingWavError),
 
     #[error("Error in making the request/getting a response.")]
-    DownloadError(#[from] HttpStreamError<Client>),
+    DownloadError(#[from] HttpStreamError<reqwest::Client>),
 
     #[error("Error initializing the stream.")]
-    StreamInitializationError(#[from] StreamInitializationError<HttpStream<Client>>),
+    StreamInitializationError(#[from] StreamInitializationError<HttpStream<reqwest::Client>>),
 }
